@@ -4,6 +4,12 @@
 # Exit immediately if a command exits with a non-zero status
 set -e
 
+# Define the hostname
+hostnamectl set-hostname ${hostname}
+
+# Add the hostname to /etc/hosts
+echo "127.0.0.1   ${hostname}" >> /etc/hosts
+
 # Add the SSH public key
 mkdir -p /home/ubuntu/.ssh
 echo "${PUBLIC_KEY}" > /home/ubuntu/.ssh/authorized_keys

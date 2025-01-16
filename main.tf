@@ -266,6 +266,7 @@ data "template_file" "bastion_user_data" {
 
   vars = {
     PUBLIC_KEY = file(var.public_key_path)
+    hostname = "bastion"
   }
 }
 
@@ -276,17 +277,12 @@ data "template_file" "k8s_master_user_data" {
   vars = {
     PUBLIC_KEY = file(var.public_key_path)
     NUM_WORKERS= var.num_workers
+    hostname = "controlplane"
   }
 }
 
-data "template_file" "k8s_worker_user_data" {
-  template = file("scripts/k8s-worker.sh")
 
-  vars = {
-    PUBLIC_KEY = file(var.public_key_path)
-    MASTER_IP  = aws_instance.controlplane.private_ip
-  }
-}
+  
 
 # Instance Bastion
 resource "aws_instance" "bastion" {
@@ -345,7 +341,12 @@ resource "aws_instance" "workers" {
     aws_security_group.worker_sg.id,
   ]
 
-  user_data = data.template_file.k8s_worker_user_data.rendered
+  user_data = templatefile("scripts/k8s-worker.sh", {
+    PUBLIC_KEY = file(var.public_key_path)
+    MASTER_IP  = aws_instance.controlplane.private_ip
+    hostname = "worker${count.index + 1}"
+  })
+  
 
   tags = merge(
     {

@@ -1,6 +1,12 @@
 #!/bin/bash
 # scripts/k8s-node.sh
 
+# Define the hostname
+hostnamectl set-hostname ${hostname}
+
+# Add the hostname to /etc/hosts
+echo "127.0.0.1   ${hostname}" >> /etc/hosts
+
 # Ajouter la clé publique SSH
 mkdir -p /home/ubuntu/.ssh
 echo "${PUBLIC_KEY}" > /home/ubuntu/.ssh/authorized_keys
