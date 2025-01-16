@@ -26,8 +26,8 @@ Clone this repository to your local machine:
 
 
 ```bash
-git clone https://github.com/yourusername/your-repo.git
-cd your-repo 
+git clone https://github.com/Maalshekto/kubeform.git
+cd kubeform
 ```
 ### 2. Install Terraform
 
