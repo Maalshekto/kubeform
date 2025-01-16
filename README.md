@@ -85,7 +85,7 @@ public_key_path = "~/.ssh/id_ed25519.pub" # Path to your SSH public key
 num_workers = 2 # Can be modify but remember : "with great power comes great responsibility"
 
 # Common Tags for resources
-cluster_name = "JMA" # Change this to a unique name for your cluster - Here a trigram based on owner name
+cluster_name = "JMA" # Change this to a unique name for your cluster - Here a trigram 
 owner = "Jean MARTIN" # Change this to your name
 deployed_by = "Jean MARTIN" # Change this to your name
 project = "my-project" # Change this to the name of your project
