@@ -89,15 +89,23 @@ bastion_ingress_user_public_ip = "YOUR_PUBLIC_IP/32" # Replace with your public 
 instance_type_bastion = "t3.small"
 instance_type_master = "t3.medium"
 instance_type_worker = "t3.medium"
-
-key_pair_name = "my-key-pair" # Replace with appropriate key pair name 
-
-public_key_path = "~/.ssh/id_ed25519.pub"
-
+public_key_path = "~/.ssh/id_ed25519.pub" # Path to your SSH public key
 num_workers = 2 # Can be modify but remember : "with great power comes great responsibility"
+
+# Common Tags for resources
+cluster_name = "JMA" # Change this to a unique name for your cluster - Here a trigram based on owner name
+owner = "Jean MARTIN" # Change this to your name
+deployed_by = "Jean MARTIN" # Change this to your name
+project = "my-project" # Change this to the name of your project
+environment = "dev" # Change this to the environment name
 ```
 
-At least, Replace `YOUR_PUBLIC_IP` with the IP address you retrieved earlier.
+Replace `YOUR_PUBLIC_IP` with the IP address you retrieved earlier.
+
+Replace cluster_name with what you want eventually a trigram based on your name 
+Check with your team that you have unique cluster_name.
+
+owner/deployed_by should be your name as you are both deployer and owner of the kubernetes cluster.
 
 ### 6. Initialize Terraform
 

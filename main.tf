@@ -4,22 +4,40 @@ provider "aws" {
   region     = var.aws_region
 }
 
+locals {
+  common_tags = {
+    Environment = var.environment
+    Owner       = var.owner
+    Project     = var.project
+    Cluster     = var.cluster_name
+    DeploymentDate = timestamp()
+    DeployedBy     = var.deployed_by
+  }
+}
+
+
 # Créer le VPC
 resource "aws_vpc" "k8s_vpc" {
   cidr_block = var.vpc_cidr
 
-  tags = {
-    Name = "k8s-vpc"
-  }
+  tags = merge(
+    {
+      Name = "${var.cluster_name}-vpc"
+    },
+    local.common_tags
+  )
 }
 
 # Créer l'Internet Gateway
 resource "aws_internet_gateway" "k8s_igw" {
   vpc_id = aws_vpc.k8s_vpc.id
 
-  tags = {
-    Name = "k8s-igw"
-  }
+  tags = merge(
+    {
+      Name = "${var.cluster_name}-igw"
+    },
+    local.common_tags
+  )
 }
 
 # Créer le subnet public
@@ -28,9 +46,12 @@ resource "aws_subnet" "public_subnet" {
   cidr_block        = var.public_subnet_cidr
   availability_zone = "${var.aws_region}a"
 
-  tags = {
-    Name = "k8s-public-subnet"
-  }
+  tags = merge (
+    {
+      Name = "${var.cluster_name}-public-subnet"
+    },
+    local.common_tags
+  )
 }
 
 # Créer le subnet privé
@@ -39,9 +60,12 @@ resource "aws_subnet" "private_subnet" {
   cidr_block        = var.private_subnet_cidr
   availability_zone = "${var.aws_region}a"
 
-  tags = {
-    Name = "k8s-private-subnet"
-  }
+  tags = merge (
+    {
+      Name = "${var.cluster_name}-private-subnet"
+    },
+    local.common_tags
+  )
 }
 
 # Créer la Route Table pour le public subnet
@@ -53,9 +77,12 @@ resource "aws_route_table" "public_rt" {
     gateway_id = aws_internet_gateway.k8s_igw.id
   }
 
-  tags = {
-    Name = "k8s-public-rt"
-  }
+  tags = merge(
+    {
+      Name = "${var.cluster_name}-public-rt"
+    },  
+    local.common_tags
+  )
 }
 
 # Associer la Route Table au public subnet
@@ -66,16 +93,24 @@ resource "aws_route_table_association" "public_rt_assoc" {
 
 # Créer la NAT Gateway
 resource "aws_eip" "nat_eip" {
-
+  tags =  merge(
+    {
+      Name = "${var.cluster_name}-nat-eip"
+    },   
+    local.common_tags
+  )
 }
 
 resource "aws_nat_gateway" "k8s_natgw" {
   allocation_id = aws_eip.nat_eip.id
   subnet_id     = aws_subnet.public_subnet.id
 
-  tags = {
-    Name = "k8s-natgw"
-  }
+  tags = merge(
+    {
+      Name = "${var.cluster_name}-nat-gw"
+    },
+    local.common_tags
+  )
 }
 
 # Créer la Route Table pour les subnets privés
@@ -87,9 +122,12 @@ resource "aws_route_table" "private_rt" {
     nat_gateway_id = aws_nat_gateway.k8s_natgw.id
   }
 
-  tags = {
-    Name = "k8s-private-rt"
-  }
+  tags = merge(
+    {
+      Name = "${var.cluster_name}-private-rt"
+    },
+    local.common_tags
+  )
 }
 
 # Associer la Route Table au private subnet
@@ -100,7 +138,7 @@ resource "aws_route_table_association" "private_rt_assoc" {
 
 # Groupe de sécurité pour le bastion
 resource "aws_security_group" "bastion_sg" {
-  name        = "bastion-sg"
+  name        = "${var.cluster_name}-bastion-sg"
   description = "Security group for the bastion host"
   vpc_id      = aws_vpc.k8s_vpc.id
 
@@ -119,14 +157,17 @@ resource "aws_security_group" "bastion_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = {
-    Name = "bastion-sg"
-  }
+  tags = merge (
+    {
+      Name = "${var.cluster_name}-bastion-sg"
+    },
+    local.common_tags
+  )
 }
 
 # Groupe de sécurité pour le control-plane
 resource "aws_security_group" "controlplane_sg" {
-  name        = "controlplane-sg"
+  name        = "${var.cluster_name}-controlplane-sg"
   description = "Security group for the Kubernetes control-plane"
   vpc_id      = aws_vpc.k8s_vpc.id
 
@@ -162,14 +203,17 @@ resource "aws_security_group" "controlplane_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = {
-    Name = "controlplane-sg"
-  }
+  tags = merge(
+    {
+      Name = "${var.cluster_name}-controlplane-sg"
+    },
+    local.common_tags 
+  )
 }
 
 # Groupe de sécurité pour les workers
 resource "aws_security_group" "worker_sg" {
-  name        = "worker-sg"
+  name        = "${var.cluster_name}-worker-sg"
   description = "Security group for the Kubernetes workers"
   vpc_id      = aws_vpc.k8s_vpc.id
 
@@ -196,14 +240,24 @@ resource "aws_security_group" "worker_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = {
-    Name = "worker-sg"
-  }
+  tags = merge(
+    {
+      Name = "${var.cluster_name}-worker-sg"
+    },
+    local.common_tags
+  )
 }
 
 resource "aws_key_pair" "deployer" {
-  key_name   = var.key_pair_name
+  key_name   = "${var.cluster_name}-key-pair"
   public_key = file(var.public_key_path) # Chemin vers votre clé publique SSH
+
+  tags = merge(
+    {
+      Name = "${var.cluster_name}-key-pair"
+    },
+    local.common_tags
+  )
 }
 
 # Clé SSH publique
@@ -239,7 +293,7 @@ resource "aws_instance" "bastion" {
   ami           = var.bastion_ami
   instance_type = var.instance_type_bastion
   subnet_id     = aws_subnet.public_subnet.id
-  key_name      = var.key_pair_name
+  key_name      = "${var.cluster_name}-key-pair"
 
   vpc_security_group_ids  = [
     aws_security_group.bastion_sg.id,
@@ -250,9 +304,12 @@ resource "aws_instance" "bastion" {
 
   user_data = data.template_file.bastion_user_data.rendered
 
-  tags = {
-    Name = "bastion"
-  }
+  tags = merge(
+    {
+      Name = "${var.cluster_name}-bastion"
+    },
+    local.common_tags
+  )
 }
 
 # Instance Control-plane
@@ -260,7 +317,7 @@ resource "aws_instance" "controlplane" {
   ami           = var.k8s_ami
   instance_type = var.instance_type_master
   subnet_id     = aws_subnet.private_subnet.id
-  key_name      = var.key_pair_name
+  key_name      = "${var.cluster_name}-key-pair"
 
   vpc_security_group_ids = [
     aws_security_group.controlplane_sg.id,
@@ -268,9 +325,12 @@ resource "aws_instance" "controlplane" {
 
   user_data = data.template_file.k8s_master_user_data.rendered
 
-  tags = {
-    Name = "k8s-controlplane"
-  }
+  tags = merge(
+    {
+      Name = "${var.cluster_name}-controlplane"
+    },
+    local.common_tags
+  )
 }
 
 # Instances Workers
@@ -279,7 +339,7 @@ resource "aws_instance" "workers" {
   ami           = var.k8s_ami
   instance_type = var.instance_type_worker
   subnet_id     = aws_subnet.private_subnet.id
-  key_name      = var.key_pair_name
+  key_name      = "${var.cluster_name}-key-pair"
 
   vpc_security_group_ids = [
     aws_security_group.worker_sg.id,
@@ -287,9 +347,12 @@ resource "aws_instance" "workers" {
 
   user_data = data.template_file.k8s_worker_user_data.rendered
 
-  tags = {
-    Name = "k8s-worker-${count.index + 1}"
-  }
+  tags = merge(
+    {
+      Name = "${var.cluster_name}-worker-${count.index + 1}"
+    },
+    local.common_tags
+  )
 }
 
 resource "local_file" "terraform_ssh_config" {

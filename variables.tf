@@ -50,10 +50,6 @@ variable "instance_type_worker" {
   default     = "t3.medium"
 }
 
-variable "key_pair_name" {
-  description = "Nom de la paire de clés SSH à utiliser."
-  default     = "my-key-pair" # Assurez-vous que cette clé existe dans AWS
-}
 
 variable "public_key_path" {
   description = "Chemin vers la clé publique SSH."
@@ -63,4 +59,30 @@ variable "public_key_path" {
 variable "num_workers" {
   description = "Nombre de workers à déployer."
   default     = 2
+}
+
+variable "cluster_name" {
+  description = "Nom unique pour le cluster Kubernetes"
+  type        = string
+}
+
+variable "environment" {
+  description = "Environnement d'exécution (e.g., dev, staging, prod)"
+  type        = string
+}
+
+variable "owner" {
+  description = "Propriétaire du cluster"
+  type        = string
+}
+
+variable "project" {
+  description = "Nom du projet"
+  type        = string
+}
+
+variable "deployed_by" {
+  description = "Nom de la personne qui déploie les ressources"
+  type        = string
+  
 }
