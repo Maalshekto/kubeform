@@ -1,0 +1,21 @@
+# Set default behavior to automatically normalize line endings
+* text=auto
+
+# Explicitly declare text files
+*.sh text eol=lf
+*.md text eol=lf
+*.tf text eol=lf
+*.hcl text eol=lf
+
+# Declare binary files
+*.pem binary
+*.key binary
+*.crt binary
+
+# Ensure Terraform templates are treated as text
+*.tpl text eol=lf
+
+# Disable diff for certain binary files
+*.pem -diff
+*.key -diff
+*.crt -diff
