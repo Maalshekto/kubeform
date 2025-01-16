@@ -56,19 +56,11 @@ Provide your AWS Access Key ID, Secret Access Key, region, and output format whe
 
 ### 4. Retrieve Your Public IP Address
 
-To securely SSH into the bastion host, you need your current public IP address. Run the following command:
+To securely SSH into the bastion host, you need your current public IP address. Use an online service in your web browser to find your public IP:
 
--   **Linux/macOS**:
-```bash
-curl -s ifconfig.me` 
-```
-    
--   **Windows PowerShell**:
-```bash
-(Invoke-RestMethod -Uri "https://api.ipify.org").Trim()
-```    
-
-Note down your public IP address.
+1.  Open your web browser.
+2.  Navigate to [WhatIsMyIP.com](https://www.whatismyip.com) or [IP Chicken](https://www.ipchicken.com).
+3.  Note down your public IP address as it will be used for SSH access to the bastion host.
 
 ### 5. Configure Terraform Variables
 
