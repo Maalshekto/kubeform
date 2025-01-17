@@ -1,5 +1,5 @@
 resource "local_file" "terraform_ssh_config" {
-  filename = pathexpand("~/.ssh/terraform_ssh_config")  # Chemin correct pour Windows
+  filename = pathexpand("~/.ssh/terraform/terraform_ssh_config_${var.cluster_name}")  # Chemin correct pour Windows
   content  = templatefile("${path.root}/templates/terraform_ssh_config.tpl", {
     bastion_public_ip       = module.bastion.bastion_public_ip
     controlplane_private_ip = module.controlplane.controlplane_private_ip
