@@ -162,17 +162,17 @@ After the infrastructure is provisioned, the EC2 instances will execute the user
 
 ### SSH Configuration
 
-A custom SSH configuration file (`terraform_ssh_config`) is generated to simplify access to the bastion host, control-plane, and worker nodes. The configuration uses the bastion host as a proxy to access the internal machines.
+A custom SSH configuration file (`terraform_ssh_config_"CLUSTERNAME"`) is generated to simplify access to the bastion host, control-plane, and worker nodes. The configuration uses the bastion host as a proxy to access the internal machines.
 
 1.  **Locate the SSH Config File**:
     
-    The file is saved at `~/.ssh/terraform_ssh_config`.
+    The file will be saved inside `~/.ssh/terraform/`.
     
-2.  **Include it in Your SSH Configuration**:
+2.  **Include the terraform folder in Your SSH Configuration**:
     
     Add the following line to your main SSH config (`~/.ssh/config`):
 	```bash
-	include ~/.ssh/terraform_ssh_config
+	include ~/.ssh/terraform/*
 	```
     
 3.  **Connect to the Bastion Host**:
