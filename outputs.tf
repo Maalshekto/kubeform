@@ -2,30 +2,30 @@
 
 output "bastion_public_ip" {
   description = "Adresse IP publique du bastion."
-  value       = aws_instance.bastion.public_ip
+  value       = module.bastion.bastion_public_ip
 }
 
 output "controlplane_private_ip" {
   description = "Adresse IP privée du control-plane."
-  value       = aws_instance.controlplane.private_ip
+  value       = module.controlplane.controlplane_private_ip
 }
 
 output "worker_private_ips" {
   description = "Adresses IP privées des workers."
-  value       = aws_instance.workers.*.private_ip
+  value       = module.workers.workers_private_ips
 }
 
 output "vpc_id" {
   description = "ID du VPC."
-  value       = aws_vpc.k8s_vpc.id
+  value       = module.vpc.vpc_id
 }
 
 output "public_subnet_id" {
   description = "ID du subnet public."
-  value       = aws_subnet.public_subnet.id
+  value       = module.vpc.public_subnet_id
 }
 
 output "private_subnet_id" {
   description = "ID du subnet privé."
-  value       = aws_subnet.private_subnet.id
+  value       = module.vpc.private_subnet_id
 }

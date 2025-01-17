@@ -2,10 +2,10 @@
 # scripts/k8s-node.sh
 
 # Define the hostname
-hostnamectl set-hostname ${hostname}
+hostnamectl set-hostname ${hostname}-${cluster_name}
 
 # Add the hostname to /etc/hosts
-echo "127.0.0.1   ${hostname}" >> /etc/hosts
+echo "127.0.0.1   ${hostname}-${cluster_name}" >> /etc/hosts
 
 # Ajouter la clé publique SSH
 mkdir -p /home/ubuntu/.ssh
@@ -62,13 +62,13 @@ sudo apt-mark hold kubelet kubeadm kubectl
 
 sudo sysctl --system
 
-# Attendre que la commande kubeadm join soit disponible via HTTP sur le master
-MASTER_IP=${MASTER_IP}  # Injecté par Terraform
-JOIN_CMD_URL="http://${MASTER_IP}:8080/join_command.sh"
+# Attendre que la commande kubeadm join soit disponible via HTTP sur le controlplane
+CONTROLPLANE=${CONTROLPLANE_IP}  # Injecté par Terraform
+JOIN_CMD_URL="http://${CONTROLPLANE_IP}:8080/join_command.sh"
 
-# Attendre que le master soit prêt et que le fichier de jointure soit disponible
+# Attendre que le controlplane soit prêt et que le fichier de jointure soit disponible
 until curl -s $JOIN_CMD_URL -o /tmp/join_command.sh; do
-  echo "Attente que le master soit prêt pour fournir la commande de jointure..."
+  echo "Attente que le controlplane soit prêt pour fournir la commande de jointure..."
   sleep 10
 done
 

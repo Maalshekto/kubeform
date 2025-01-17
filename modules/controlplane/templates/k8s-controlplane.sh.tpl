@@ -2,10 +2,10 @@
 # scripts/k8s-node.sh
 
 # Define the hostname
-hostnamectl set-hostname ${hostname}
+hostnamectl set-hostname ${hostname}-${cluster_name}
 
 # Add the hostname to /etc/hosts
-echo "127.0.0.1   ${hostname}" >> /etc/hosts
+echo "127.0.0.1   ${hostname}-${cluster_name}" >> /etc/hosts
 
 # Ajouter la clé publique SSH
 mkdir -p /home/ubuntu/.ssh
@@ -77,7 +77,7 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 curl "https://raw.githubusercontent.com/projectcalico/calico/v3.29.1/manifests/calico.yaml" -O
 kubectl apply -f calico.yaml
 
-# Wait for the master node to be ready
+# Wait for the controlplane node to be ready
 kubectl wait node $(hostname) --for=condition=Ready --timeout=600s
 echo "Generating join command for the worker nodes..."
 KUBEADM_JOIN_CMD=$(kubeadm token create --print-join-command --ttl 24h)

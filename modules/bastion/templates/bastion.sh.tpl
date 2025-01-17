@@ -5,10 +5,10 @@
 set -e
 
 # Define the hostname
-hostnamectl set-hostname ${hostname}
+hostnamectl set-hostname ${hostname}-${cluster_name}
 
 # Add the hostname to /etc/hosts
-echo "127.0.0.1   ${hostname}" >> /etc/hosts
+echo "127.0.0.1   ${hostname}-${cluster_name}" >> /etc/hosts
 
 # Add the SSH public key
 mkdir -p /home/ubuntu/.ssh

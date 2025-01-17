@@ -30,6 +30,69 @@ variable "bastion_ingress_user_public_ip" {
   default     = "YOUR_PUBLIC_IP/32"
 }
 
+variable "k8s_controlplane_sg_rules" {
+  description = "Security group rules for the Kubernetes control-plane"
+  type        = list(object({
+    description = string
+    from_port   = number
+    to_port     = number
+    protocol    = string
+    cidr_blocks = list(string)
+  }))
+  default = [
+    {
+      description = "Kubernetes API from bastion and workers"
+      from_port   = 6443
+      to_port     = 6443
+      protocol    = "tcp"
+      cidr_blocks = ["10.0.0.0/16"]
+    }, 
+    {
+      description = "Join the cluster"
+      from_port   = 8080
+      to_port     = 8080
+      protocol    = "tcp"
+      cidr_blocks = ["10.0.0.0/16"] # VPC CIDR
+    },
+    {
+      description = "SSH from bastion"
+      from_port   = 22
+      to_port     = 22
+      protocol    = "tcp"
+      cidr_blocks = ["10.0.0.0/16"] # VPC CIDR
+    }
+    # Add more rules here if needed
+  ]
+}
+
+variable "k8s_worker_sg_rules" {
+  description = "Security group rules for the Kubernetes control-plane"
+  type        = list(object({
+    description = string
+    from_port   = number
+    to_port     = number
+    protocol    = string
+    cidr_blocks = list(string)
+  }))
+  default = [
+  {
+    description = "SSH from bastion"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.0.0/16"] # VPC CIDR
+  },
+  {
+    description = "Kubernetes worker communication"
+    from_port   = 30000
+    to_port     = 32767
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.0.0/16"] # VPC CIDR
+  }
+    # Add more rules here if needed
+  ]
+}
+
 variable "k8s_ami" {
   description = "AMI pour les instances Kubernetes (Ubuntu 20.04)."
   default     = "ami-08b426ca1360eb488" # Remplacez par l'AMI appropriée pour votre région
@@ -40,7 +103,7 @@ variable "instance_type_bastion" {
   default     = "t3.small"
 }
 
-variable "instance_type_master" {
+variable "instance_type_controlplane" {
   description = "Type d'instance pour le control-plane."
   default     = "t3.medium"
 }

@@ -79,7 +79,7 @@ k8s_ami = "ami-08b426ca1360eb488" # Replace with appropriate AMI for your region
 bastion_ingress_user_public_ip = "YOUR_PUBLIC_IP/32" # Replace with your public IP
 
 instance_type_bastion = "t3.small"
-instance_type_master = "t3.medium"
+instance_type_controlplane = "t3.medium"
 instance_type_worker = "t3.medium"
 public_key_path = "~/.ssh/id_ed25519.pub" # Path to your SSH public key
 num_workers = 2 # Can be modify but remember : "with great power comes great responsibility"
@@ -137,7 +137,7 @@ After the infrastructure is provisioned, the EC2 instances will execute the user
     -   Adds your SSH public key for secure access.
     -   Updates the system packages.
     -   Installs `htop`, Docker, and Docker Compose.
--   **Kubernetes Master Node (`k8s-master.sh`)**:
+-   **Kubernetes Controlplane Node (`k8s-controlplane.sh`)**:
     
     -   Adds your SSH public key.
     -   Disables swap.
@@ -155,7 +155,7 @@ After the infrastructure is provisioned, the EC2 instances will execute the user
     -   Installs Docker and configures containerd.
     -   Enables IP forwarding and configures necessary kernel modules.
     -   Installs Kubernetes components (`kubelet`, `kubeadm`, `kubectl`).
-    -   Joins the Kubernetes cluster using the join command provided by the master node.
+    -   Joins the Kubernetes cluster using the join command provided by the controlplane node.
     -   Restarts Docker and kubelet to ensure proper operation.
 
 ## Accessing the Machines
@@ -178,17 +178,31 @@ A custom SSH configuration file (`terraform_ssh_config`) is generated to simplif
 3.  **Connect to the Bastion Host**:
 
 	```bash 
-	ssh bastion
+    # bastion-"CLUSTER_NAME", example with JMA 
+	ssh bastion-JMA 
+
+    # or for short: 
+    ssh b-JMA
 	```
 4.  **Connect to the Control-plane Node**:
-	```bash 
-    ssh aws-cp
+	
+    ```bash 
+    # controlplane-"CLUSTER_NAME", example with JMA 
+    ssh controlplane-JMA
+
+    # or for short:
+    ssh cp-JMA
 	```
 5.  **Connect to a Worker Node**:
     
-    Replace `<worker-number>` with the appropriate number (e.g., `aws-wk1`, `aws-wk2`):
-	```
-	ssh aws-wk1
+    Replace `<worker-number>` with the appropriate number (e.g., `worker1-JMA`, `worker2-JMA`):
+	```bash
+    # worker-"CLUSTER_NAME",  example with JMA 
+	ssh worker1-JMA 
+
+    # or for short:
+    ssh wk1-JMA
+
 	```
 ### Verify SSH Access
 
@@ -201,7 +215,7 @@ Once the Terraform deployment is complete and the Kubernetes cluster is initiali
 1.  **SSH into the Control-plane Node**:
     
 	```bash 
-    ssh aws-cp
+    ssh controlplane-JMA
 	```
     
 2.  **Check Kubernetes Nodes**:
