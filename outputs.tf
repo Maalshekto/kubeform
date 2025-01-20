@@ -5,16 +5,6 @@ output "bastion_public_ip" {
   value       = module.bastion.bastion_public_ip
 }
 
-output "controlplane_private_ip" {
-  description = "Adresse IP privée du control-plane."
-  value       = module.controlplane.controlplane_private_ip
-}
-
-output "worker_private_ips" {
-  description = "Adresses IP privées des workers."
-  value       = module.workers.workers_private_ips
-}
-
 output "vpc_id" {
   description = "ID du VPC."
   value       = module.vpc.vpc_id
@@ -27,5 +17,19 @@ output "public_subnet_id" {
 
 output "private_subnet_id" {
   description = "ID du subnet privé."
-  value       = module.vpc.private_subnet_id
+  value       =  module.vpc.private_subnet_ids
+  
+}
+
+output "clusters_ips" {
+  description = "Adresses IP pour tous les clusters Kubernetes"
+  value = {
+    bastion_public_ip = module.bastion.bastion_public_ip
+    clusters = {
+      for cluster_key, cluster in var.clusters : cluster_key => {
+        controlplane_private_ip = module.controlplane[cluster_key].controlplane_private_ip
+        workers_private_ips     = module.workers[cluster_key].workers_private_ips
+      }
+    }
+  }
 }

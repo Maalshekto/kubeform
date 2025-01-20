@@ -1,6 +1,11 @@
+variable "trigram" {
+  description = "Trigram for the Kubernetes cluster"
+  type        = string
+}
+
 variable "cluster_name" {
   description = "Unique name for the Kubernetes cluster"
-  type        = string
+  type        = string  
 }
 
 variable "ami" {

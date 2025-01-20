@@ -1,8 +1,9 @@
+
 # Terraform Kubernetes Cluster Setup
 
 ## Description
 
-This project automates the deployment of a Kubernetes development/lab cluster on AWS using EC2 instances (not EKS). It provisions the necessary AWS infrastructure, including VPC, subnets, security groups, and EC2 instances for the bastion host, Kubernetes control-plane, and worker nodes. The setup scripts install and configure Kubernetes components, Docker, and other essential tools. Additionally, it generates an SSH configuration file for seamless access to the cluster nodes via the bastion host.
+This project automates the deployment of multiple Kubernetes development/lab clusters on AWS using EC2 instances (not EKS). It provisions the necessary AWS infrastructure, including a single VPC with multiple private subnets, security groups, and EC2 instances for the bastion host, Kubernetes control-planes, and worker nodes for each cluster. The setup scripts install and configure Kubernetes components, Docker, and other essential tools. Additionally, it generates SSH configuration files for seamless access to the cluster nodes via the bastion host.
 
 ## Prerequisites
 
@@ -67,35 +68,46 @@ To securely SSH into the bastion host, you need your current public IP address. 
 create a `terraform.tfvars` file to specify your variable values. Here's an example template:
 
 ```hcl
-aws_region = "eu-west-3"
+aws_region  =  "eu-west-3"
+vpc_cidr  =  "10.0.0.0/16"
+trigram  =  "JMA"
 
-vpc_cidr = "10.0.0.0/16"
-public_subnet_cidr = "10.0.1.0/24"
-private_subnet_cidr = "10.0.2.0/24"
-
-bastion_ami = "ami-08b426ca1360eb488" # Replace with appropriate AMI for your region
-k8s_ami = "ami-08b426ca1360eb488" # Replace with appropriate AMI for your region
-
-bastion_ingress_user_public_ip = "YOUR_PUBLIC_IP/32" # Replace with your public IP
-
-instance_type_bastion = "t3.small"
-instance_type_controlplane = "t3.medium"
-instance_type_worker = "t3.medium"
-public_key_path = "~/.ssh/id_ed25519.pub" # Path to your SSH public key
-num_workers = 2 # Can be modify but remember : "with great power comes great responsibility"
-
+bastion  =  {
+	name  =  "bastion"
+	public_subnet_cidr  =  "10.0.1.0/24"
+	ami  =  "ami-08b426ca1360eb48"  # Replace with appropriate AMI for your region
+	ingress_user_public_ip  =  "YOUR_PUBLIC_IP/32"  # Replace with your public IP
+	instance_type  =  "t3.small"
+}
+clusters  =  {
+	cluster1  = {
+		name  =  "blue"
+		private_subnet_cidr  =  "10.0.2.0/24"
+		ami  =  "ami-08b426ca1360eb48"  # Exemple d'AMI Ubuntu 20.04 LTS
+		instance_type_controlplane  =  "t3.medium"
+		instance_type_worker  =  "t3.medium"
+		num_workers  =  2
+	},
+	cluster2  = {
+		name  =  "green"
+		private_subnet_cidr  =  "10.0.3.0/24"
+		ami  =  "ami-08b426ca1360eb48"
+		instance_type_controlplane  =  "t3.medium"
+		instance_type_worker  =  "t3.medium"
+		num_workers  =  2
+	}
+}
+public_key_path  =  "~/.ssh/id_ed25519.pub"  # Path to your SSH public key
 # Common Tags for resources
-cluster_name = "JMA" # Change this to a unique name for your cluster - Here a trigram 
-owner = "Jean MARTIN" # Change this to your name
-deployed_by = "Jean MARTIN" # Change this to your name
-project = "my-project" # Change this to the name of your project
-environment = "dev" # Change this to the environment name
+project  =  "my-project"  # Change this to the name of your project
+environment  =  "dev"  # Change this to the environment name
+owner  =  "Jean MARTIN"  # Change this to your name
+deployed_by  =  "Jean MARTIN"  # Change this to your name
 ```
-
 Replace `YOUR_PUBLIC_IP` with the IP address you retrieved earlier.
 
-Replace cluster_name with what you want eventually a trigram based on your name 
-Check with your team that you have unique cluster_name.
+Replace trigram with what you want eventually a trigram based on your name 
+Check with your team that you have unique trigram.
 
 owner/deployed_by should be your name as you are both deployer and owner of the kubernetes cluster.
 
@@ -162,7 +174,7 @@ After the infrastructure is provisioned, the EC2 instances will execute the user
 
 ### SSH Configuration
 
-A custom SSH configuration file (`terraform_ssh_config_"CLUSTERNAME"`) is generated to simplify access to the bastion host, control-plane, and worker nodes. The configuration uses the bastion host as a proxy to access the internal machines.
+Custom SSH configuration files are generated for each cluster in the `~/.ssh/terraform/` directory to simplify access to the bastion host, control-planes, and worker nodes. The configuration uses the bastion host as a proxy to access the internal machines.
 
 1.  **Locate the SSH Config File**:
     
@@ -178,30 +190,30 @@ A custom SSH configuration file (`terraform_ssh_config_"CLUSTERNAME"`) is genera
 3.  **Connect to the Bastion Host**:
 
 	```bash 
-    # bastion-"CLUSTER_NAME", example with JMA 
-	ssh bastion-JMA 
+    # bastion
+	ssh bastion 
 
     # or for short: 
-    ssh b-JMA
+    ssh b
 	```
 4.  **Connect to the Control-plane Node**:
 	
     ```bash 
-    # controlplane-"CLUSTER_NAME", example with JMA 
-    ssh controlplane-JMA
+    # controlplane-"CLUSTER_NAME", example with blue
+    ssh controlplane-blue
 
     # or for short:
-    ssh cp-JMA
+    ssh cp-blue
 	```
 5.  **Connect to a Worker Node**:
     
-    Replace `<worker-number>` with the appropriate number (e.g., `worker1-JMA`, `worker2-JMA`):
+    Replace `<worker-number>` with the appropriate number (e.g., `worker1-green`, `worker2-green`):
 	```bash
-    # worker-"CLUSTER_NAME",  example with JMA 
-	ssh worker1-JMA 
+    # worker-"CLUSTER_NAME",  example with green
+	ssh worker1-green
 
     # or for short:
-    ssh wk1-JMA
+    ssh wk1-green
 
 	```
 ### Verify SSH Access
@@ -212,10 +224,10 @@ Ensure that you can SSH into the bastion host and from there access the control-
 
 Once the Terraform deployment is complete and the Kubernetes cluster is initialized, perform the following steps to ensure everything is functioning correctly:
 
-1.  **SSH into the Control-plane Node**:
-    
+1.  **SSH into each Control-plane Node**:
+    Here with blue:
 	```bash 
-    ssh controlplane-JMA
+    ssh controlplane-blue
 	```
     
 2.  **Check Kubernetes Nodes**:

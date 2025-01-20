@@ -1,4 +1,4 @@
-variable "cluster_name" {
+variable "trigram" {
   description = "Unique name for the Kubernetes cluster"
   type        = string
 }

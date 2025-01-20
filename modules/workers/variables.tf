@@ -3,6 +3,12 @@ variable "cluster_name" {
   type        = string
 }
 
+variable "trigram" {
+  description = "Unique name for the Kubernetes cluster"
+  type        = string
+  
+}
+
 variable "ami" {
   description = "AMI ID for the worker nodes"
   type        = string

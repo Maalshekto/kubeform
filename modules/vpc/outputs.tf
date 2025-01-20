@@ -8,7 +8,12 @@ output "public_subnet_id" {
   value       = aws_subnet.public.id
 }
 
-output "private_subnet_id" {
+output "private_subnet_ids" {
   description = "The ID of the private subnet"
-  value       = aws_subnet.private.id
+  value       = aws_subnet.private[*].id
+}
+
+output "private_subnet_cidrs" {
+  description = "CIDR des sous-réseaux privés"
+  value       = var.private_subnet_cidrs
 }

@@ -1,19 +1,21 @@
 variable "vpc_cidr" {
   description = "CIDR block for the VPC"
   type        = string
-  default     = "10.0.0.0/16"
 }
 
 variable "public_subnet_cidr" {
   description = "CIDR block for the public subnet"
   type        = string
-  default     = "10.0.1.0/24"
 }
 
-variable "private_subnet_cidr" {
+variable "private_subnet_cidrs" {
   description = "CIDR block for the private subnet"
-  type        = string
-  default     = "10.0.2.0/24"
+  type        = list(string)
+}
+
+variable "cluster_names" {
+  description = "Names of the clusters"
+  type        = list(string)
 }
 
 variable "aws_region" {
@@ -21,8 +23,8 @@ variable "aws_region" {
   type        = string
 }
 
-variable "cluster_name" {
-  description = "The name of the cluster"
+variable "trigram" {
+  description = "The trigram of the owner of the resources"
   type        = string
 }
 

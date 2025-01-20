@@ -3,7 +3,7 @@ locals {
     Environment = var.environment
     Owner       = var.owner
     Project     = var.project
-    Cluster     = var.cluster_name
+    Cluster     = var.trigram
     DeploymentDate = timestamp()
     DeployedBy     = var.deployed_by
   }
@@ -11,7 +11,7 @@ locals {
 
 # Groupe de sécurité pour le bastion
 resource "aws_security_group" "bastion_sg" {
-  name        = "${var.cluster_name}-bastion-sg"
+  name        = "${var.trigram}-bastion-sg"
   description = "Security group for the bastion host"
   vpc_id      = var.vpc_id
 
@@ -32,7 +32,7 @@ resource "aws_security_group" "bastion_sg" {
 
   tags = merge (
     {
-      Name = "${var.cluster_name}-bastion-sg"
+      Name = "${var.trigram}-bastion-sg"
     },
     local.common_tags
   )
@@ -40,7 +40,7 @@ resource "aws_security_group" "bastion_sg" {
 
 # Groupe de sécurité pour le control-plane
 resource "aws_security_group" "controlplane_sg" {
-  name        = "${var.cluster_name}-controlplane-sg"
+  name        = "${var.trigram}-controlplane-sg"
   description = "Security group for the Kubernetes control-plane"
   vpc_id      = var.vpc_id
 
@@ -64,7 +64,7 @@ resource "aws_security_group" "controlplane_sg" {
 
   tags = merge(
     {
-      Name = "${var.cluster_name}-controlplane-sg"
+      Name = "${var.trigram}-controlplane-sg"
     },
     local.common_tags 
   )
@@ -72,7 +72,7 @@ resource "aws_security_group" "controlplane_sg" {
 
 # Groupe de sécurité pour les workers
 resource "aws_security_group" "worker_sg" {
-  name        = "${var.cluster_name}-worker-sg"
+  name        = "${var.trigram}-worker-sg"
   description = "Security group for the Kubernetes workers"
   vpc_id      = var.vpc_id
 
@@ -96,7 +96,7 @@ resource "aws_security_group" "worker_sg" {
 
   tags = merge(
     {
-      Name = "${var.cluster_name}-worker-sg"
+      Name = "${var.trigram}-worker-sg"
     },
     local.common_tags
   )

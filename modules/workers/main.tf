@@ -3,7 +3,7 @@ locals {
     Environment = var.environment
     Owner       = var.owner
     Project     = var.project
-    Cluster     = var.cluster_name
+    Trigram     = var.trigram
     DeploymentDate = timestamp()
     DeployedBy     = var.deployed_by
   }
@@ -15,7 +15,7 @@ resource "aws_instance" "workers" {
   ami           = var.ami
   instance_type = var.instance_type
   subnet_id     = var.subnet_id
-  key_name      = "${var.cluster_name}-key-pair"
+  key_name      = "${var.trigram}-key-pair"
 
   vpc_security_group_ids = [
     var.security_group_id,
@@ -31,7 +31,7 @@ resource "aws_instance" "workers" {
 
   tags = merge(
     {
-      Name = "${var.cluster_name}-worker-${count.index + 1}"
+      Name = "${var.trigram}-${var.cluster_name}-worker-${count.index + 1}"
     },
     local.common_tags
   )

@@ -10,24 +10,57 @@ variable "vpc_cidr" {
   default     = "10.0.0.0/16"
 }
 
-variable "public_subnet_cidr" {
-  description = "CIDR pour le subnet public."
-  default     = "10.0.1.0/24"
+variable "trigram" {
+  description = "Trigram of the owner of the resources"
+  type        = string
 }
 
-variable "private_subnet_cidr" {
-  description = "CIDR pour le subnet privé."
-  default     = "10.0.2.0/24"
+variable "bastion" {
+  description = "Map des paramètres pour le bastion"
+  type = object({
+    name                 = string
+    public_subnet_cidr   = string
+    ami          = string
+    ingress_user_public_ip = string
+    instance_type = string
+  })
+  default = {
+    name                 = "bastion"
+    public_subnet_cidr   = "10.0.1.0/24"
+    ami          = "ami-0c94855ba95c71c99" # Remplacez par l'AMI appropriée pour votre région
+    ingress_user_public_ip = "YOUR_PUBLIC_IP/32"
+    instance_type = "t3.small"
+  }
 }
 
-variable "bastion_ami" {
-  description = "AMI pour l'instance bastion (Ubuntu 20.04)."
-  default     = "ami-08b426ca1360eb488" # Remplacez par l'AMI appropriée pour votre région
-}
-
-variable "bastion_ingress_user_public_ip" {
-  description = "Adresse IP publique de l'utilisateur pour l'accès SSH au bastion."
-  default     = "YOUR_PUBLIC_IP/32"
+variable "clusters" {
+  description = "Map des clusters Kubernetes à créer"
+  type = map(object({
+    name                 = string
+    private_subnet_cidr  = string
+    ami                  = string
+    instance_type_controlplane = string
+    instance_type_worker = string
+    num_workers     = number
+  }))
+  default = {
+    cluster1 = {
+      name                 = "blue"
+      private_subnet_cidr  = "10.0.2.0/24"
+      ami                  = "ami-0c94855ba95c71c99" # Exemple d'AMI Ubuntu 20.04 LTS
+      instance_type_controlplane = "t3.medium"
+      instance_type_worker = "t3.medium"
+      num_workers     = 2
+    },
+    cluster2 = {
+      name                 = "green"
+      private_subnet_cidr  = "10.0.3.0/24"
+      ami                  = "ami-0c94855ba95c71c99"
+      instance_type_controlplane = "t3.medium"
+      instance_type_worker = "t3.medium"
+      num_workers     = 2
+    }
+  }
 }
 
 variable "k8s_controlplane_sg_rules" {
@@ -93,39 +126,13 @@ variable "k8s_worker_sg_rules" {
   ]
 }
 
-variable "k8s_ami" {
-  description = "AMI pour les instances Kubernetes (Ubuntu 20.04)."
-  default     = "ami-08b426ca1360eb488" # Remplacez par l'AMI appropriée pour votre région
-}
-
-variable "instance_type_bastion" {
-  description = "Type d'instance pour le bastion."
-  default     = "t3.small"
-}
-
-variable "instance_type_controlplane" {
-  description = "Type d'instance pour le control-plane."
-  default     = "t3.medium"
-}
-
-variable "instance_type_worker" {
-  description = "Type d'instance pour les workers."
-  default     = "t3.medium"
-}
-
-
 variable "public_key_path" {
   description = "Chemin vers la clé publique SSH."
   default     = "~/.ssh/id_ed25519.pub"
 }
 
-variable "num_workers" {
-  description = "Nombre de workers à déployer."
-  default     = 2
-}
-
-variable "cluster_name" {
-  description = "Nom unique pour le cluster Kubernetes"
+variable "project" {
+  description = "Nom du projet"
   type        = string
 }
 
@@ -136,11 +143,6 @@ variable "environment" {
 
 variable "owner" {
   description = "Propriétaire du cluster"
-  type        = string
-}
-
-variable "project" {
-  description = "Nom du projet"
   type        = string
 }
 

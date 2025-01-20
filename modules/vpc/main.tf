@@ -3,7 +3,7 @@ locals {
     Environment = var.environment
     Owner       = var.owner
     Project     = var.project
-    Cluster     = var.cluster_name
+    Trigram     = var.trigram
     DeploymentDate = timestamp()
     DeployedBy     = var.deployed_by
   }
@@ -15,7 +15,7 @@ resource "aws_vpc" "this" {
 
   tags = merge(
     {
-      Name = "${var.cluster_name}-vpc"
+      Name = "${var.trigram}-vpc"
     },
     local.common_tags
   )
@@ -27,7 +27,7 @@ resource "aws_internet_gateway" "this" {
 
   tags = merge(
     {
-      Name = "${var.cluster_name}-igw"
+      Name = "${var.trigram}-igw"
     },
     local.common_tags
   )
@@ -41,7 +41,7 @@ resource "aws_subnet" "public" {
 
   tags = merge (
     {
-      Name = "${var.cluster_name}-public-subnet"
+      Name = "${var.trigram}-public-subnet"
     },
     local.common_tags
   )
@@ -49,13 +49,14 @@ resource "aws_subnet" "public" {
 
 # Créer le subnet privé
 resource "aws_subnet" "private" {
+  count      = length(var.private_subnet_cidrs)
   vpc_id            = aws_vpc.this.id
-  cidr_block        = var.private_subnet_cidr
+  cidr_block        = var.private_subnet_cidrs[count.index]
   availability_zone = "${var.aws_region}a"
 
   tags = merge (
     {
-      Name = "${var.cluster_name}-private-subnet"
+      Name = "${var.trigram}-${var.cluster_names[count.index]}-private-subnet"
     },
     local.common_tags
   )
@@ -67,7 +68,7 @@ resource "aws_nat_gateway" "this" {
 
   tags = merge(
     {
-      Name = "${var.cluster_name}-nat-gw"
+      Name = "${var.trigram}-nat-gw"
     },
     local.common_tags
   )
@@ -77,7 +78,7 @@ resource "aws_nat_gateway" "this" {
 resource "aws_eip" "nat" {
   tags =  merge(
     {
-      Name = "${var.cluster_name}-nat-eip"
+      Name = "${var.trigram}-nat-eip"
     },   
     local.common_tags
   )
@@ -94,7 +95,7 @@ resource "aws_route_table" "public" {
 
   tags = merge(
     {
-      Name = "${var.cluster_name}-public-rt"
+      Name = "${var.trigram}-public-rt"
     },  
     local.common_tags
   )
@@ -117,7 +118,7 @@ resource "aws_route_table" "private" {
 
   tags = merge(
     {
-      Name = "${var.cluster_name}-private-rt"
+      Name = "${var.trigram}-private-rt"
     },
     local.common_tags
   )
@@ -125,6 +126,7 @@ resource "aws_route_table" "private" {
 
 # Associer la Route Table au private subnet
 resource "aws_route_table_association" "private" {
-  subnet_id      = aws_subnet.private.id
+  count          = length(var.private_subnet_cidrs)
+  subnet_id      = aws_subnet.private[count.index].id
   route_table_id = aws_route_table.private.id
 }
