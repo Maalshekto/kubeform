@@ -75,25 +75,25 @@ trigram  =  "JMA"
 bastion  =  {
 	name  =  "bastion"
 	public_subnet_cidr  =  "10.0.1.0/24"
-	ami  =  "ami-08b426ca1360eb48"  # Replace with appropriate AMI for your region
+    ami                  = "ami-0e2d1158a7687ccde" # Replace with appropriate AMI for your region
 	ingress_user_public_ip  =  "YOUR_PUBLIC_IP/32"  # Replace with your public IP
-	instance_type  =  "t3.small"
+	instance_type  =  "t4g.small"
 }
 clusters  =  {
 	cluster1  = {
 		name  =  "blue"
 		private_subnet_cidr  =  "10.0.2.0/24"
-		ami  =  "ami-08b426ca1360eb48"  # Exemple d'AMI Ubuntu 20.04 LTS
-		instance_type_controlplane  =  "t3.medium"
-		instance_type_worker  =  "t3.medium"
+		ami  =  "ami-0e2d1158a7687ccde"  # AMI for Ubuntu 20.04 LTS ARM64 eu-west-3
+		instance_type_controlplane  =  "t4g.medium"
+		instance_type_worker  =  "t4g.medium"
 		num_workers  =  2
 	},
 	cluster2  = {
 		name  =  "green"
 		private_subnet_cidr  =  "10.0.3.0/24"
-		ami  =  "ami-08b426ca1360eb48"
-		instance_type_controlplane  =  "t3.medium"
-		instance_type_worker  =  "t3.medium"
+		ami  =  "ami-0e2d1158a7687ccde"
+		instance_type_controlplane  =  "t4g.medium"
+		instance_type_worker  =  "t4g.medium"
 		num_workers  =  2
 	}
 }
