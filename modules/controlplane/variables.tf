@@ -8,6 +8,11 @@ variable "cluster_name" {
   type        = string  
 }
 
+variable "k8s_version" {
+  description = "Kubernetes version"
+  type        = string    
+}
+
 variable "ami" {
   description = "AMI ID for the controlplane host"
   type        = string

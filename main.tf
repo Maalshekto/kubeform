@@ -61,6 +61,7 @@ module "controlplane" {
   trigram             = var.trigram
   cluster_name        = each.value.name
   ami                 = each.value.ami
+  k8s_version         = each.value.k8s_version
   instance_type       = each.value.instance_type_controlplane
   subnet_id           = local.subnet_map[each.value.private_subnet_cidr]
   key_pair_name       = aws_key_pair.deployer.key_name
@@ -80,6 +81,7 @@ module "workers" {
   controlplane_private_ip = module.controlplane[each.key].controlplane_private_ip
   cluster_name        = each.value.name
   ami                 = each.value.ami
+  k8s_version         = each.value.k8s_version
   instance_type       = each.value.instance_type_worker
   subnet_id           = local.subnet_map[each.value.private_subnet_cidr]
   key_pair_name       = aws_key_pair.deployer.key_name

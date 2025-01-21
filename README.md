@@ -87,6 +87,7 @@ clusters  =  {
 		instance_type_controlplane  =  "t4g.medium"
 		instance_type_worker  =  "t4g.medium"
 		num_workers  =  2
+        k8s_version = "1.31.5"
 	},
 	cluster2  = {
 		name  =  "green"
@@ -95,6 +96,7 @@ clusters  =  {
 		instance_type_controlplane  =  "t4g.medium"
 		instance_type_worker  =  "t4g.medium"
 		num_workers  =  2
+        k8s_version = "1.32.1"
 	}
 }
 public_key_path  =  "~/.ssh/id_ed25519.pub"  # Path to your SSH public key

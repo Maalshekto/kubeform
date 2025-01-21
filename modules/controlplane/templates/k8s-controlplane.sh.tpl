@@ -1,6 +1,10 @@
 #!/bin/bash
 # scripts/k8s-node.sh
 
+set -e
+# Redirect all output to a log file
+exec > >(tee /var/log/k8s-controlplane.log|logger -t k8s-controlplane -s 2>/dev/console) 2>&1
+
 # Define the hostname
 hostnamectl set-hostname ${hostname}-${cluster_name}
 
@@ -54,10 +58,17 @@ EOF
 sysctl --system
 
 # Install Kubernetes
-sudo curl -fsSL "https://pkgs.k8s.io/core:/stable:/v1.31/deb/Release.key" | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.31/deb/ / " | sudo tee /etc/apt/sources.list.d/kubernetes.list
+version=${k8s_version}
+echo "Installing Kubernetes version: $version"
+major_minor=$(echo "$version" | cut -d '.' -f 1,2)
+echo "Major minor version: $major_minor"
+sudo curl -fsSL "https://pkgs.k8s.io/core:/stable:/v$major_minor/deb/Release.key" | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v$major_minor/deb/ / " | sudo tee /etc/apt/sources.list.d/kubernetes.list
 sudo apt-get update
-sudo apt-get install -y kubelet kubeadm kubectl
+# Get exact version of kubeadm, kubectl and kubelet
+exact_vers=`apt-cache madison kubeadm | grep $version | awk '{print $3}' | head -1`
+echo "Exact version: $exact_vers"
+sudo apt-get install -y kubelet=$exact_vers kubeadm=$exact_vers kubectl=$exact_vers
 sudo apt-mark hold kubelet kubeadm kubectl
 
 # Initialize the Kubernetes cluster
@@ -92,11 +103,14 @@ chmod 700 get_helm.sh
 ./get_helm.sh
 
 # Wait for the cluster including workers to be ready
-do 
+nb_node_ready=`kubectl get nodes --no-headers=true | awk '{print $2}' | grep  'Ready' | wc -l`
+echo "Number of nodes ready: $nb_node_ready"
+
+while [ $nb_node_ready -lt ${NUM_WORKERS + 1} ]; do
+  echo "Waiting for all nodes to be ready..."
+  sleep 10
   nb_node_ready=`kubectl get nodes --no-headers=true | awk '{print $2}' | grep  'Ready' | wc -l`
-  echo "Number of nodes ready: $nb_node_ready"
-  sleep 5
-done while [ $nb_node_ready -lt ${NUM_WORKERS + 1} ]
+done
 
 
 # Helm install Ingress Nginx

@@ -1,5 +1,8 @@
 #!/bin/bash
 # scripts/k8s-node.sh
+set -e
+# Redirect all output to a log file
+exec > >(tee /var/log/k8s-worker.log|logger -t k8s-worker -s 2>/dev/console) 2>&1
 
 # Define the hostname
 hostnamectl set-hostname ${hostname}-${cluster_name}
@@ -54,10 +57,17 @@ EOF
 sysctl --system
 
 # Install Kubernetes
-sudo curl -fsSL "https://pkgs.k8s.io/core:/stable:/v1.31/deb/Release.key" | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.31/deb/ / " | sudo tee /etc/apt/sources.list.d/kubernetes.list
+version=${k8s_version}
+echo "Installing Kubernetes version: $version"
+major_minor=$(echo "$version" | cut -d '.' -f 1,2)
+echo "Major and minor version: $major_minor"
+sudo curl -fsSL "https://pkgs.k8s.io/core:/stable:/v$major_minor/deb/Release.key" | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v$major_minor/deb/ / " | sudo tee /etc/apt/sources.list.d/kubernetes.list
 sudo apt-get update
-sudo apt-get install -y kubelet kubeadm kubectl
+# Get exact version of kubeadm, kubectl and kubelet
+exact_vers=`apt-cache madison kubeadm | grep $version | awk '{print $3}' | head -1`
+echo "Exact version of kubeadm, kubectl and kubelet: $exact_vers"
+sudo apt-get install -y kubelet=$exact_vers kubeadm=$exact_vers kubectl=$exact_vers
 sudo apt-mark hold kubelet kubeadm kubectl
 
 sudo sysctl --system
