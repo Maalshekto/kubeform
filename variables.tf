@@ -42,6 +42,7 @@ variable "clusters" {
     instance_type_controlplane = string
     instance_type_worker = string
     num_workers     = number
+    k8s_version     = string
   }))
   default = {
     cluster1 = {
@@ -51,6 +52,7 @@ variable "clusters" {
       instance_type_controlplane = "t4g.medium"
       instance_type_worker = "t4g.medium"
       num_workers     = 2
+      k8s_version = "1.31.5"
     },
     cluster2 = {
       name                 = "green"
@@ -59,6 +61,7 @@ variable "clusters" {
       instance_type_controlplane = "t4g.medium"
       instance_type_worker = "t4g.medium"
       num_workers     = 2
+      k8s_version = "1.32.1"
     }
   }
 }

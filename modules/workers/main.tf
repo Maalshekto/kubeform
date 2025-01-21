@@ -22,6 +22,7 @@ resource "aws_instance" "workers" {
   ]
 
   user_data = templatefile("${path.module}/templates/k8s-worker.sh.tpl", {
+    k8s_version = var.k8s_version
     hostname     = "worker${count.index + 1}"
     cluster_name = var.cluster_name
     PUBLIC_KEY = file(var.public_key_path)

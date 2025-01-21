@@ -22,6 +22,7 @@ resource "aws_instance" "controlplane" {
 
   user_data = templatefile("${path.module}/templates/k8s-controlplane.sh.tpl", {
     hostname     = "controlplane"
+    k8s_version  = var.k8s_version
     cluster_name = var.cluster_name
     PUBLIC_KEY = file(var.public_key_path)
     NUM_WORKERS= var.num_workers

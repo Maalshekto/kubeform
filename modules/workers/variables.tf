@@ -45,6 +45,11 @@ variable "num_workers" {
   default     = 2
 }
 
+variable "k8s_version" {
+  description = "Kubernetes version"
+  type        = string    
+}
+
 variable "controlplane_private_ip" {
   description = "Private IP of the controlplane node"
   type        = string
