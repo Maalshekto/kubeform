@@ -11,6 +11,16 @@ locals {
 
 provider "aws" {
   region     = var.aws_region
+  default_tags {
+    tags = {
+      Environment = var.environment
+      Owner       = var.owner
+      Project     = var.project
+      Trigram     = var.trigram
+      DeployedBy     = var.deployed_by
+      Service        = var.service
+    }
+  } 
 }
 
 module "vpc" {
@@ -19,25 +29,17 @@ module "vpc" {
   public_subnet_cidr  = var.bastion.public_subnet_cidr
   private_subnet_cidrs = [for cluster in var.clusters : cluster.private_subnet_cidr]
   aws_region          = var.aws_region
-  trigram             = var.trigram
-  environment         = var.environment
-  owner               = var.owner
-  deployed_by         = var.deployed_by
-  project             = var.project
   cluster_names       = [for cluster in var.clusters : cluster.name]
+  trigram            = var.trigram
 }
 
 module "security_groups" {
   source                = "./modules/security_groups"
-  trigram          = var.trigram
+  trigram               = var.trigram
   vpc_id                = module.vpc.vpc_id
   bastion_ingress_cidr  = var.bastion.ingress_user_public_ip
   k8s_controlplane_sg_rules = var.k8s_controlplane_sg_rules
   k8s_worker_sg_rules        = var.k8s_worker_sg_rules
-  environment         = var.environment
-  owner               = var.owner
-  deployed_by         = var.deployed_by
-  project             = var.project
 }
 
 module "bastion" {
@@ -49,10 +51,6 @@ module "bastion" {
   key_pair_name    = aws_key_pair.deployer.key_name
   public_key_path     =  var.public_key_path	
   security_group_id = module.security_groups.bastion_sg_id
-  environment         = var.environment
-  owner               = var.owner
-  deployed_by         = var.deployed_by
-  project             = var.project
 }
 
 module "controlplane" {
@@ -68,10 +66,7 @@ module "controlplane" {
   public_key_path     = var.public_key_path	
   security_group_id   = module.security_groups.controlplane_sg_id
   num_workers         = each.value.num_workers
-  environment         = var.environment
-  owner               = var.owner
-  deployed_by         = var.deployed_by
-  project             = var.project
+  zsh_theme           = each.value.zsh_theme
 }
 
 module "workers" {
@@ -87,8 +82,5 @@ module "workers" {
   key_pair_name       = aws_key_pair.deployer.key_name
   public_key_path     =  var.public_key_path
   security_group_id   = module.security_groups.worker_sg_id
-  environment         = var.environment
-  owner               = var.owner
-  deployed_by         = var.deployed_by
-  project             = var.project
+  zsh_theme           = each.value.zsh_theme
 }

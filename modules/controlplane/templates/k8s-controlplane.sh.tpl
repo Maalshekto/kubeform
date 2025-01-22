@@ -112,6 +112,12 @@ while [ $nb_node_ready -lt ${NUM_WORKERS + 1} ]; do
   nb_node_ready=`kubectl get nodes --no-headers=true | awk '{print $2}' | grep  'Ready' | wc -l`
 done
 
+sudo apt-get install -y zsh
+sudo -u ubuntu bash -c 'yes y | CHSH=yes RUNZSH=no sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"'
+# Vérifier si "kubectl" est déjà dans le fichier; si non, on l’ajoute
+grep -q "kubectl" /home/ubuntu/.zshrc || sed -i '/^plugins=(/ s/)/ kubectl)/' /home/ubuntu/.zshrc
+sed -i 's/^ZSH_THEME=.*/ZSH_THEME="${ZSH_THEME}"/' /home/ubuntu/.zshrc
+sudo chsh -s /usr/bin/zsh ubuntu
 
 # Helm install Ingress Nginx
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx

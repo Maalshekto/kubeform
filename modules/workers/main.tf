@@ -1,14 +1,3 @@
-locals {
-  common_tags = {
-    Environment = var.environment
-    Owner       = var.owner
-    Project     = var.project
-    Trigram     = var.trigram
-    DeploymentDate = timestamp()
-    DeployedBy     = var.deployed_by
-  }
-}
-
 # Instances Workers
 resource "aws_instance" "workers" {
   count         = var.num_workers
@@ -27,13 +16,9 @@ resource "aws_instance" "workers" {
     cluster_name = var.cluster_name
     PUBLIC_KEY = file(var.public_key_path)
     CONTROLPLANE_IP  = var.controlplane_private_ip
+    ZSH_THEME = var.zsh_theme
   })
-  
-
-  tags = merge(
-    {
-      Name = "${var.trigram}-${var.cluster_name}-worker-${count.index + 1}"
-    },
-    local.common_tags
-  )
+  tags = {
+    Name = "${var.trigram}-${var.cluster_name}-worker-${count.index + 1}"
+  }
 }
