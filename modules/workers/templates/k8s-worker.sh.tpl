@@ -91,3 +91,10 @@ sudo $JOIN_CMD
 # Redémarrer Docker et kubelet pour s'assurer qu'ils fonctionnent correctement
 sudo systemctl restart docker
 sudo systemctl restart kubelet
+
+sudo apt-get install -y zsh
+sudo -u ubuntu bash -c 'yes y | CHSH=yes RUNZSH=no sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"'
+# Vérifier si "kubectl" est déjà dans le fichier; si non, on l’ajoute
+grep -q "kubectl" /home/ubuntu/.zshrc || sed -i '/^plugins=(/ s/)/ kubectl)/' /home/ubuntu/.zshrc
+sed -i 's/^ZSH_THEME=.*/ZSH_THEME="${ZSH_THEME}"/' /home/ubuntu/.zshrc
+sudo chsh -s /usr/bin/zsh ubuntu

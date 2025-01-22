@@ -32,24 +32,3 @@ variable "security_group_id" {
   description = "Security group ID for the bastion host"
   type        = string
 }
-
-variable "environment" {
-  description = "Environment (e.g., dev, staging, prod)"
-  type        = string
-}
-
-variable "owner" {
-  description = "Owner of the cluster"
-  type        = string
-}
-
-variable "project" {
-  description = "Nom du projet"
-  type        = string
-}
-
-variable "deployed_by" {
-  description = "Nom de la personne qui déploie les ressources"
-  type        = string
-  
-}

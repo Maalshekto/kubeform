@@ -44,29 +44,13 @@ variable "security_group_id" {
   type        = string
 }
 
-variable "environment" {
-  description = "Environment (e.g., dev, staging, prod)"
-  type        = string
-}
-
-variable "owner" {
-  description = "Owner of the cluster"
-  type        = string
-}
-
-variable "project" {
-  description = "Project name"
-  type        = string
-}
-
-variable "deployed_by" {
-  description = "Name of the person deploying the resources"
-  type        = string
-  
-}
-
 variable "num_workers" {
   description = "Number of worker nodes"
   type        = number
   default     = 2
+}
+
+variable "zsh_theme" {
+  description = "Zsh theme"
+  type        = string
 }

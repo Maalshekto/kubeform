@@ -55,23 +55,7 @@ variable "controlplane_private_ip" {
   type        = string
 }
 
-variable "environment" {
-  description = "Environment (e.g., dev, staging, prod)"
+variable "zsh_theme" {
+  description = "Zsh theme"
   type        = string
-}
-
-variable "owner" {
-  description = "Owner of the cluster"
-  type        = string
-}
-
-variable "project" {
-  description = "Project name"
-  type        = string
-}
-
-variable "deployed_by" {
-  description = "Name of the person deploying the resources"
-  type        = string
-  
 }

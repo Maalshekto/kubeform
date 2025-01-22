@@ -1,14 +1,3 @@
-locals {
-  common_tags = {
-    Environment = var.environment
-    Owner       = var.owner
-    Project     = var.project
-    Cluster     = var.trigram
-    DeploymentDate = timestamp()
-    DeployedBy     = var.deployed_by
-  }
-}
-
 # Instance Bastion
 resource "aws_instance" "bastion" {
   ami           = var.ami
@@ -28,11 +17,7 @@ resource "aws_instance" "bastion" {
     hostname = "bastion"
     cluster_name = var.trigram
   })
-
-  tags = merge(
-    {
-      Name = "${var.trigram}-bastion"
-    },
-    local.common_tags
-  )
+  tags = {
+    Name = "${var.trigram}-bastion"
+  }
 }

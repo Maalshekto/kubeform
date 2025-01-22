@@ -27,24 +27,3 @@ variable "trigram" {
   description = "The trigram of the owner of the resources"
   type        = string
 }
-
-variable "environment" {
-  description = "Environnement d'exécution (e.g., dev, staging, prod)"
-  type        = string
-}
-
-variable "owner" {
-  description = "Propriétaire du cluster"
-  type        = string
-}
-
-variable "project" {
-  description = "Nom du projet"
-  type        = string
-}
-
-variable "deployed_by" {
-  description = "Nom de la personne qui déploie les ressources"
-  type        = string
-  
-}

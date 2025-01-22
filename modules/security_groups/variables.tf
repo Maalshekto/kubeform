@@ -34,24 +34,3 @@ variable "k8s_worker_sg_rules" {
     cidr_blocks = list(string)
   }))
 }
-
-variable "environment" {
-  description = "Environment (e.g., dev, staging, prod)"
-  type        = string
-}
-
-variable "owner" {
-  description = "Owner of the cluster"
-  type        = string
-}
-
-variable "project" {
-  description = "Nom du projet"
-  type        = string
-}
-
-variable "deployed_by" {
-  description = "Nom de la personne qui déploie les ressources"
-  type        = string
-  
-}

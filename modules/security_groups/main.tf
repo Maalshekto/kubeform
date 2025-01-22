@@ -1,14 +1,3 @@
-locals {
-  common_tags = {
-    Environment = var.environment
-    Owner       = var.owner
-    Project     = var.project
-    Cluster     = var.trigram
-    DeploymentDate = timestamp()
-    DeployedBy     = var.deployed_by
-  }
-}
-
 # Groupe de sécurité pour le bastion
 resource "aws_security_group" "bastion_sg" {
   name        = "${var.trigram}-bastion-sg"
@@ -30,12 +19,9 @@ resource "aws_security_group" "bastion_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  tags = merge (
-    {
-      Name = "${var.trigram}-bastion-sg"
-    },
-    local.common_tags
-  )
+  tags = {
+    Name = "${var.trigram}-bastion-sg"
+  }
 }
 
 # Groupe de sécurité pour le control-plane
@@ -61,13 +47,9 @@ resource "aws_security_group" "controlplane_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
-  tags = merge(
-    {
-      Name = "${var.trigram}-controlplane-sg"
-    },
-    local.common_tags 
-  )
+  tags = {
+    Name = "${var.trigram}-controlplane-sg"
+  }
 }
 
 # Groupe de sécurité pour les workers
@@ -92,12 +74,8 @@ resource "aws_security_group" "worker_sg" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+  } 
+  tags = {
+    Name = "${var.trigram}-worker-sg"
   }
-
-  tags = merge(
-    {
-      Name = "${var.trigram}-worker-sg"
-    },
-    local.common_tags
-  )
 }

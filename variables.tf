@@ -43,6 +43,7 @@ variable "clusters" {
     instance_type_worker = string
     num_workers     = number
     k8s_version     = string
+    zsh_theme       = string
   }))
   default = {
     cluster1 = {
@@ -53,6 +54,7 @@ variable "clusters" {
       instance_type_worker = "t4g.medium"
       num_workers     = 2
       k8s_version = "1.31.5"
+      zsh_theme       = "fishy"
     },
     cluster2 = {
       name                 = "green"
@@ -62,6 +64,7 @@ variable "clusters" {
       instance_type_worker = "t4g.medium"
       num_workers     = 2
       k8s_version = "1.32.1"
+      zsh_theme       = "fishy"
     }
   }
 }
@@ -140,8 +143,9 @@ variable "project" {
 }
 
 variable "environment" {
-  description = "Environnement d'exécution (e.g., dev, staging, prod)"
+  description = "Environnement d'exécution (e.g., Dev, Stage, Prod)"
   type        = string
+  default = "Dev"
 }
 
 variable "owner" {
@@ -153,4 +157,9 @@ variable "deployed_by" {
   description = "Nom de la personne qui déploie les ressources"
   type        = string
   
+}
+variable "service" {
+  description = "Concerned service"
+  type = string
+  default = "Devops"
 }
