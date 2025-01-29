@@ -5,10 +5,10 @@
 set -e
 
 # Define the hostname
-hostnamectl set-hostname ${hostname}-${cluster_name}
+hostnamectl set-hostname ${hostname}-${trigram}
 
 # Add the hostname to /etc/hosts
-echo "127.0.0.1   ${hostname}-${cluster_name}" >> /etc/hosts
+echo "127.0.0.1   ${hostname}-${trigram}" >> /etc/hosts
 
 # Add the SSH public key
 mkdir -p /home/ubuntu/.ssh
@@ -29,6 +29,27 @@ apt install -y docker.io
 systemctl enable docker
 systemctl start docker
 
-# Install Docker Compose
-curl -SL https://github.com/docker/compose/releases/download/v2.32.3/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
-chmod +x /usr/local/bin/docker-compose
+# Configure Traefik
+mkdir -p /etc/traefik
+cat <<EOF > /etc/traefik/traefik.toml
+# Création du fichier traefik.toml (config statique)
+${traefik_conf}
+EOF
+
+# Dump the dynamic configuration to a file
+cat <<EOF > /etc/traefik/dynamic_conf.toml
+${dynamic_conf}
+EOF
+
+# Erase eventual Windows line endings
+sed -i 's/\r$//g' /etc/traefik/*.toml
+
+docker run -d --name traefik \
+  -p 80:80 \
+  -p 8080:8080 \
+  -v /etc/traefik/:/etc/traefik/ \
+  traefik \
+  --api.dashboard=true \
+  --api.insecure=true \
+  --entrypoints.web.address=:80 \
+  --providers.docker=true

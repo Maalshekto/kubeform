@@ -1,4 +1,4 @@
-# Créer le VPC
+# Create the VPC
 resource "aws_vpc" "this" {
   cidr_block = var.vpc_cidr
 
@@ -9,7 +9,7 @@ resource "aws_vpc" "this" {
   )
 }
 
-# Créer l'Internet Gateway
+# Create the Internet Gateway
 resource "aws_internet_gateway" "this" {
   vpc_id = aws_vpc.this.id
 
@@ -18,7 +18,7 @@ resource "aws_internet_gateway" "this" {
   }
 }
 
-# Créer le subnet public
+# Create the public subnet
 resource "aws_subnet" "public" {
   vpc_id            = aws_vpc.this.id
   cidr_block        = var.public_subnet_cidr
@@ -29,7 +29,7 @@ resource "aws_subnet" "public" {
   }
 }
 
-# Créer le subnet privé
+# Create the private subnet
 resource "aws_subnet" "private" {
   count             = length(var.private_subnet_cidrs)
   vpc_id            = aws_vpc.this.id
@@ -48,14 +48,14 @@ resource "aws_nat_gateway" "this" {
   }
 }
 
-# Créer la NAT Gateway
+# Create the NAT Gateway
 resource "aws_eip" "nat" {
   tags = {
     Name = "${var.trigram}-nat-eip"
   }
 }
 
-# Créer la Route Table pour le public subnet
+# Create the Route Table for the public subnet
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.this.id
 
@@ -68,13 +68,13 @@ resource "aws_route_table" "public" {
   }
 }
 
-# Associer la Route Table au public subnet
+# Associate the Route Table with the public subnet
 resource "aws_route_table_association" "public" {
   subnet_id      = aws_subnet.public.id
   route_table_id = aws_route_table.public.id
 }
 
-# Créer la Route Table pour les subnets privés
+# Create the Route Table for the private subnets
 resource "aws_route_table" "private" {
   vpc_id = aws_vpc.this.id
 
@@ -87,7 +87,7 @@ resource "aws_route_table" "private" {
   }
 }
 
-# Associer la Route Table au private subnet
+# Associate the Route Table with the private subnets
 resource "aws_route_table_association" "private" {
   count          = length(var.private_subnet_cidrs)
   subnet_id      = aws_subnet.private[count.index].id

@@ -1,0 +1,4 @@
+# .gitattributes
+
+# Force all .tpl files to have LF line endings
+*.tpl text eol=lf
