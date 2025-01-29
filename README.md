@@ -252,6 +252,9 @@ kubectl get nodes
 
 You should see the control-plane and worker nodes listed with the status `Ready`. The cluster should be ready around 5 minutes after `terraform apply`. If some nodes are not ready or even not present, wait several minutes for them to be present & ready.
 
+## Traefik Dashboard access
+You should be able to access to Traefik Dashboard using bastion IP on 8080 port: example http://35.181.171.75:8080
+
 ## Jenkins access
 
 You should be able to access to Jenkins instance using bastion IP and /jenkins route: example http://35.181.171.75/jenkins 
