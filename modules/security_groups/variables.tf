@@ -13,6 +13,17 @@ variable "bastion_ingress_cidr" {
   type        = string
 }
 
+variable "bastion_sg_rules" {
+  description = "Security group rules for the Bastion host"
+  type        = list(object({
+    description = string
+    from_port   = number
+    to_port     = number
+    protocol    = string
+  }))
+}
+
+
 variable "k8s_controlplane_sg_rules" {
   description = "Security group rules for the Kubernetes control-plane"
   type        = list(object({

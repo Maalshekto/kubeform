@@ -54,3 +54,8 @@ variable "zsh_theme" {
   description = "Zsh theme"
   type        = string
 }
+
+variable "cni" {
+  description = "Container Network Interface (CNI) plugin"
+  type        = string 
+}

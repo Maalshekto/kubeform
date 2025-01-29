@@ -1,4 +1,4 @@
-# Instances Workers
+# Workers Instances
 resource "aws_instance" "workers" {
   count         = var.num_workers
   ami           = var.ami

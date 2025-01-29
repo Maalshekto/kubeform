@@ -1,4 +1,4 @@
-# Instance Control-plane
+# Control-plane Instance 
 resource "aws_instance" "controlplane" {
   ami           = var.ami
   instance_type = var.instance_type
@@ -16,6 +16,8 @@ resource "aws_instance" "controlplane" {
     PUBLIC_KEY = file(var.public_key_path)
     NUM_WORKERS= var.num_workers
     ZSH_THEME = var.zsh_theme
+    CNI = var.cni
+    jenkins_install = templatefile("${path.module}/templates/jenkins-install.sh.tpl", {})
   })
 
   tags = {

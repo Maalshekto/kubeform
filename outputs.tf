@@ -17,8 +17,8 @@ output "public_subnet_id" {
 
 output "private_subnet_id" {
   description = "ID du subnet privé."
-  value       =  module.vpc.private_subnet_ids
-  
+  value       = module.vpc.private_subnet_ids
+
 }
 
 output "clusters_ips" {
